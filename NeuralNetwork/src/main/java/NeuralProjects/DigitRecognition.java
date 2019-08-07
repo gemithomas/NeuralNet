@@ -15,17 +15,19 @@ public class DigitRecognition {
 		
 
         //create hidden layer that has 4 neurons and 3 inputs per neuron
-        NNLayer layer1 = new NNLayer(10, 784);
+        NNLayer layer1 = new NNLayer(20, 784);
 
         // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NNLayer layer2 = new NNLayer(10, 10);
-        
+        NNLayer layer2 = new NNLayer(10, 20);
         NNLayer layer3 = new NNLayer(10, 10);
+        
+        //NNLayer layer4 = new NNLayer(10, 10);
         ArrayList<NNLayer> list = new ArrayList<NNLayer>();
         list.add(layer1);
         list.add(layer2);
         list.add(layer3);
+        //list.add(layer4);
         
         NNet net = new NNet(list, 0.1);
         
@@ -52,7 +54,10 @@ public class DigitRecognition {
 	    
 	    System.out.println("Training the neural net");
 	    long start = System.currentTimeMillis();
-	    net.backpropagation(inputFromFile, outputFromFile, 5000);
+	    net.backpropagation(inputFromFile, outputFromFile, 200);
+	    //check the Precision for output from training 
+	    //double output[][] = net.getOutput();
+	    //predictionCheckFromBackProp(inputFromFile, outputFromFile, net);
 	    long finish = System.currentTimeMillis();
 	    long timeElapsed = finish - start;
 	    System.out.println("Finished training in (sec) "+ timeElapsed/1000);
@@ -69,7 +74,24 @@ public class DigitRecognition {
 	    double[][] testOutputFromFile = ftu.getOutput();
 	    
 	    predict(testInputFromFile, testOutputFromFile, net);
-
+	    
+    }
+	
+	public static void predictionCheckFromBackProp(double[][] testInput, double[][] ExpectedOutput, NNet net) {
+        double output[][] = net.getOutput();
+        
+        double predictedOutput[][] = predictedOutput(output);
+        // Precision
+        double precisionCount = 0;
+        for(int i = 0;i< predictedOutput.length;i++)
+        {  	
+        		if(predictedOutput[i][0] == ExpectedOutput[i][0] )
+        		{
+        			precisionCount++;
+        		}
+        }
+        double precision = precisionCount/predictedOutput.length;
+        System.out.println(precision);           
     }
 	
     public static void predict(double[][] testInput, double[][] ExpectedOutput, NNet net) {
