@@ -15,7 +15,7 @@ public class RecognizeColumn {
 
         // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NNLayer layer2 = new NNLayer(1, 5);
+        NNLayer layer2 = new NNLayer(2, 5);
         ArrayList<NNLayer> list = new ArrayList<NNLayer>();
         list.add(layer1);
         list.add(layer2);
@@ -33,16 +33,16 @@ public class RecognizeColumn {
 	    };
 	
 	    double[][] outputs = new double[][]{
-	            {0},
-	            {1},
-	            {1},
-	            {0},
-	            {0},
-	            {1},
+	            {0,1},
+	            {1,1},
+	            {1,0},
+	            {0,1},
+	            {0,0},
+	            {1,1},
 	    };
 	
 	    System.out.println("Training the neural net");
-	    net.backpropagation(inputs, outputs, 10000);
+	    net.train(inputs, outputs, 10000);
 	    System.out.println("Finished training");
 	    
 	    // calculate the predictions on unknown data
@@ -50,7 +50,7 @@ public class RecognizeColumn {
         predict(new double[][]{{0, 1, 0, 1}}, net);
 
         // 0, 1, 0
-        predict(new double[][]{{1, 1, 0, 1}}, net);
+        predict(new double[][]{{1, 1, 1, 0}}, net);
 
     }
 
@@ -63,7 +63,7 @@ public class RecognizeColumn {
                 + testInput[0][1] + " "
                 + testInput[0][2] + " "
                 + testInput[0][3] + " -> "
-                + net.getOutput()[0][0] + ", expected -> " + testInput[0][0]);
+                + net.getOutput()[0][0] + ", "+ net.getOutput()[0][1] + " expected -> " + testInput[0][0]);
     }
 
 	}
