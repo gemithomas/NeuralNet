@@ -8,6 +8,7 @@ public class NNLayer {
 	public double hiddenLayer[][];
 	public NNLayer(int neuronCount, int inputCount) {
 		
+		System.out.println("Layer created with Neuron Count = "+ neuronCount);
 		weightArr = new double[inputCount][neuronCount];
 		Random generator = new Random(0);
 		
