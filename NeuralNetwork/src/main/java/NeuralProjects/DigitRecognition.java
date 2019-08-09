@@ -13,14 +13,20 @@ public class DigitRecognition {
 
 	public static void main(String[] args) throws IOException {
 		
+		System.out.println("Start of Training:");
 		long start_pgm = System.currentTimeMillis();
-        //create hidden layer that has 4 neurons and 3 inputs per neuron
-        NNLayer layer1 = new NNLayer(20, 784);
+		int num_neuron_layer1 = Integer.valueOf(args[0]);
+		int num_neuron_layer2 = Integer.valueOf(args[1]);
+		int num_iteration = Integer.valueOf(args[2]);
+		double learningRate = Double.valueOf(args[3]);
+		
+        NNLayer layer1 = new NNLayer(num_neuron_layer1, 784);
+        
 
         // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NNLayer layer2 = new NNLayer(20, 20);
-        NNLayer layer3 = new NNLayer(10, 20);
+        NNLayer layer2 = new NNLayer(num_neuron_layer2, num_neuron_layer1);
+        NNLayer layer3 = new NNLayer(10, num_neuron_layer2);
         
         //NNLayer layer4 = new NNLayer(10, 10);
         ArrayList<NNLayer> list = new ArrayList<NNLayer>();
@@ -28,16 +34,16 @@ public class DigitRecognition {
         list.add(layer2);
         list.add(layer3);
         //list.add(layer4);
+        System.out.println("Learning Rate is = "+learningRate);
+        NNet net = new NNet(list, learningRate);
         
-        NNet net = new NNet(list, 0.01);
-        
-	    FileUtil fu = new FileUtil("Input_2k.txt", true);
+	    FileUtil fu = new FileUtil("Input.txt", true);
 	    double[][] inputFromFile = fu.getInput();
 	    double[][] outputFromFile = fu.getOutput();
 	    
-	    System.out.println("Training the neural net");
+	    System.out.println("Training the neural net with num_iteration "+ num_iteration);
 	    long start = System.currentTimeMillis();
-	    net.backpropagation(inputFromFile, outputFromFile, 2000);
+	    net.train(inputFromFile, outputFromFile, num_iteration);
 	    //check the Precision for output from training 
 	    //double output[][] = net.getOutput();
 	    predictionCheckFromBackProp(inputFromFile, outputFromFile, net);
@@ -45,7 +51,7 @@ public class DigitRecognition {
 	    long timeElapsed = finish - start;
 	    System.out.println("Finished training in (sec) "+ timeElapsed/1000);
 	    
-	    FileUtil ftu = new FileUtil("Test_Input_500.txt", false);
+	    FileUtil ftu = new FileUtil("Test_Input.txt", false);
 	    double[][] testInputFromFile = ftu.getInput();
 	    double[][] testOutputFromFile = ftu.getOutput();
 	    
