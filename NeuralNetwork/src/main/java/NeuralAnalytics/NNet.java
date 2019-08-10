@@ -18,6 +18,8 @@ public class NNet {
 	public void forwardpropagation(double[][] input)
 	{	
 		double[][] previous_output = input;
+		//1st Layer - Input - N(dataset) x 784, Weight - 784 x number of neurons in input(Y)
+		//2nd Layer - output from 1 is input to 2. NxY into weights ( Yx number Of Neurons(Z) .......)
 		for(int i=0;i<list.size();i++)
 		{
 			list.get(i).hiddenLayer = NNUtil.applySigmoidFunc(NNUtil.matrixMultiplication(previous_output, list.get(i).weightArr));
@@ -28,14 +30,16 @@ public class NNet {
 	public void train(double[][] input, double[][] output, int iterations)
 	{
 		long fwd_time = 0,back_time = 0;
+		//forward and backward - iteration number times!
 		for(int iter=0;iter<iterations;iter++)
 		{
 			long start_fwd = System.currentTimeMillis();
 			forwardpropagation(input);
 			long end_fwd = System.currentTimeMillis();
 			fwd_time  += end_fwd- start_fwd;
-		
-			double[][] errorlastLayer = NNUtil.matrixSubtraction(output, list.get(list.size()-1).hiddenLayer);
+			
+			//Cost calculation
+			double[][] errorlastLayer = NNUtil.matrixSubtraction(output,list.get(list.size()-1).hiddenLayer);
 			double[][] current_error;
 			double[][] previous_delta = null;
 			adjustmentList.clear();
@@ -79,8 +83,6 @@ public class NNet {
 			}
 		}
 		
-		//System.out.println("Time taken for fwd  in (sec) "+ fwd_time/1000);
-		//System.out.println("Time taken for back  in (sec) "+ back_time/1000);
 	}
 	
 	// AdjustableWeight Class added to create objects and add to adjustmentList!
@@ -114,6 +116,7 @@ public class NNet {
 		}
 	}
 	
+	//Output at Last Layer
 	public double[][] getOutput() {
         return list.get(list.size()-1).hiddenLayer;
     }
