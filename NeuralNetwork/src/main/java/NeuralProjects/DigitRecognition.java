@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import NeuralAnalytics.NNLayer;
 import NeuralAnalytics.NNet;
@@ -21,19 +24,14 @@ public class DigitRecognition {
 		double learningRate = Double.valueOf(args[3]);
 		
         NNLayer layer1 = new NNLayer(num_neuron_layer1, 784);
-        
-
-        // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
-        // (mapped from the previous hidden layer)
         NNLayer layer2 = new NNLayer(num_neuron_layer2, num_neuron_layer1);
         NNLayer layer3 = new NNLayer(10, num_neuron_layer2);
         
-        //NNLayer layer4 = new NNLayer(10, 10);
         ArrayList<NNLayer> list = new ArrayList<NNLayer>();
         list.add(layer1);
         list.add(layer2);
         list.add(layer3);
-        //list.add(layer4);
+
         System.out.println("Learning Rate is = "+learningRate);
         NNet net = new NNet(list, learningRate);
         
@@ -44,8 +42,8 @@ public class DigitRecognition {
 	    System.out.println("Training the neural net with num_iteration "+ num_iteration);
 	    long start = System.currentTimeMillis();
 	    net.train(inputFromFile, outputFromFile, num_iteration);
-	    //check the Precision for output from training 
-	    //double output[][] = net.getOutput();
+
+	    //We have trained the neural network.
 	    predictionCheckFromBackProp(inputFromFile, outputFromFile, net);
 	    long finish = System.currentTimeMillis();
 	    long timeElapsed = finish - start;
@@ -58,6 +56,7 @@ public class DigitRecognition {
 	    predict(testInputFromFile, testOutputFromFile, net);
 	    long end_pgm = System.currentTimeMillis();
 	    System.out.println("Finished training in (sec) "+ (end_pgm-start_pgm)/1000);
+	    
 	    
     }
 	
@@ -76,7 +75,8 @@ public class DigitRecognition {
         		}
         }
         double precision = precisionCount/predictedOutput.length;
-        System.out.println("Precision from training data set " + precision);           
+        System.out.println("Precision from training data set " + precision); 
+        createConfusionMatrix(predictedOutput,actualOutput);
     }
 	
     public static void predict(double[][] testInput, double[][] ExpectedOutput, NNet net) {
@@ -94,7 +94,47 @@ public class DigitRecognition {
         		}
         }
         double precision = precisionCount/predictedOutput.length;
-        System.out.println("Precision from test data set " + precision);          
+        System.out.println("Precision from test data set " + precision);    
+        createConfusionMatrix(predictedOutput,ExpectedOutput);
+    }
+    public static void createConfusionMatrix(double[][] predictedOutput, double[][] ExpectedOutput)
+    {
+    	HashMap<Integer,TreeMap<Integer,Integer>> confusionMatrix = new HashMap<Integer,TreeMap<Integer,Integer>>();
+    	//First Index is the Actual output and it's value is another map which shows how the expected output is predicted
+    	//For Eg Key 2 contains map where the actual output 2 is predicted as 
+    	//-1 is when 2 is predicted as both 2 and another number
+    	for(int i = 0; i < 10; i++)
+    	{
+    		TreeMap<Integer,Integer> map = new TreeMap<Integer,Integer>();
+    		for(int j = 0; j < 10; j++)
+    		{
+    			map.put(j,0);
+    		}
+    		map.put(-1,0);
+    		confusionMatrix.put(i,map);
+    		
+    	}
+    	for(int i = 0;i< ExpectedOutput.length;i++)
+    	{
+    		TreeMap<Integer,Integer> map = confusionMatrix.get((int)ExpectedOutput[i][0]);
+    		int val = map.get((int)predictedOutput[i][0]);
+			val++;
+			map.put((int) predictedOutput[i][0], val);
+    	}
+    	System.out.println("Col   NA, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9");
+    	for (Entry<Integer, TreeMap<Integer, Integer>> entry : confusionMatrix.entrySet())  
+    	{
+    		Integer actualPrediction = entry.getKey();
+    		System.out.print("Row " + actualPrediction+" ");
+    		
+    		TreeMap<Integer,Integer> map = entry.getValue();
+    		for (Entry<Integer, Integer> entry2 : map.entrySet())
+    		{
+    			System.out.print(entry2.getValue()+", ");
+    		}
+    		System.out.println("");
+    		
+    	}
     }
     
     public static double[][] convertBinaryRepresentationToInt( double output[][])
