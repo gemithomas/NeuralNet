@@ -145,5 +145,37 @@ public class NNUtilTest
 		double delta = 0.2;
 		assertEquals(expectedOutput, actualOutput, delta);
 	}  
+	
+	@Test
+    public void sigmoidFunction()
+    {
+        //1 / (1 + Math.exp(-x));
+        assertEquals(1, NNUtil.sigmoidFunction(1), 1);
+        assertEquals(1, NNUtil.sigmoidFunction(3), 1);
+        assertEquals(1, NNUtil.sigmoidFunction(4), 1);
+
+    }
+
+    @Test
+    public void sigmoidDerivativeFunction()
+    {
+        //x * (1 - x);
+        assertEquals(-2.0, NNUtil.sigmoidDerivativeFunction(2), 1);
+        assertEquals(-12.0, NNUtil.sigmoidDerivativeFunction(4), 1);
+        assertEquals(-42.0, NNUtil.sigmoidDerivativeFunction(7), 1);
+
+
+    }
+
+    @Test
+    public void scaleByValue()
+    {
+        //x = y * x;
+        assertEquals(6.0, NNUtil.scaleByValue(2, 3), 1);
+        assertEquals(12.0, NNUtil.scaleByValue(4, 3), 1);
+        assertEquals(30.0, NNUtil.scaleByValue(10, 3), 1);
+
+
+    }
 
 }
